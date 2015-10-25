@@ -34,7 +34,7 @@
 
 #include "main_footer.h"
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE uint_fast32_t density_main_footer_read(density_memory_location *restrict in, density_main_footer *restrict footer) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE uint_fast32_t density_main_footer_read(density_memory_location *DENSITY_RESTRICT in, density_main_footer *DENSITY_RESTRICT footer) {
     DENSITY_MEMCPY(&footer->previousBlockRelativeStartPosition, in->pointer, sizeof(density_main_footer));
     in->pointer += sizeof(density_main_footer);
     in->available_bytes -= sizeof(density_main_footer);

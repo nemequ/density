@@ -34,7 +34,7 @@
 
 #include "main_header.h"
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE uint_fast32_t density_main_header_read(density_memory_location *restrict in, density_main_header *restrict header) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE uint_fast32_t density_main_header_read(density_memory_location *DENSITY_RESTRICT in, density_main_header *DENSITY_RESTRICT header) {
     density_byte *pointer = in->pointer;
     header->version[0] = *(pointer);
     header->version[1] = *(pointer + 1);
@@ -48,7 +48,7 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE uint_fast32_t density_main_header_re
     return sizeof(density_main_header);
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE uint_fast32_t density_main_header_write(density_memory_location *restrict out, const DENSITY_COMPRESSION_MODE compressionMode, const DENSITY_BLOCK_TYPE blockType, const density_main_header_parameters parameters) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE uint_fast32_t density_main_header_write(density_memory_location *DENSITY_RESTRICT out, const DENSITY_COMPRESSION_MODE compressionMode, const DENSITY_BLOCK_TYPE blockType, const density_main_header_parameters parameters) {
     density_byte *pointer = out->pointer;
     *(pointer) = DENSITY_MAJOR_VERSION;
     *(pointer + 1) = DENSITY_MINOR_VERSION;

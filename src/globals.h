@@ -42,14 +42,35 @@
 
 #include "density_api.h"
 
-#if !defined(__clang__) && !defined(__GNUC__)
-#error Unsupported compiler.
+#if defined(_MSC_VER) && !defined(I_KNOW_MSVC_IS_SLOW)
+#pragma message ("MSVC produces slow binaries for with DENSITY")
 #endif
 
+#if defined(__GNUC__)
 #define DENSITY_FORCE_INLINE    inline __attribute__((always_inline))
+#elif defined(_MSC_VER)
+#define DENSITY_FORCE_INLINE    __forceinline
+#else
+#define DENSITY_FORCE_INLINE    inline
+#endif
 
+#if defined(__GNUC__)
 #define DENSITY_MEMCPY          __builtin_memcpy
 #define DENSITY_MEMMOVE         __builtin_memmove
+#else
+#define DENSITY_MEMCPY          memcpy
+#define DENSITY_MEMMOVE         memmove
+#endif
+
+#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
+#define DENSITY_RESTRICT restrict
+#elif defined(__GNUC__)
+#define DENSITY_RESTRICT __restrict__
+#elif defined(_MSC_VER)
+#define DENSITY_RESTRICT __restrict
+#else
+#define DENSITY_RESTRICT
+#endif
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define DENSITY_LITTLE_ENDIAN_64(b)   ((uint64_t)b)
@@ -157,8 +178,19 @@
 #define DENSITY_DICTIONARY_PREFERRED_RESET_CYCLE_SHIFT    6
 #define DENSITY_DICTIONARY_PREFERRED_RESET_CYCLE          (1 << DENSITY_DICTIONARY_PREFERRED_RESET_CYCLE_SHIFT)
 
+#if defined(__GNUC__)
 #define density_likely(x)                         __builtin_expect(!!(x), 1)
 #define density_unlikely(x)                       __builtin_expect(!!(x), 0)
+#else
+#define density_likely(x)                         !!(x)
+#define density_unlikely(x)                       !!(x)
+#endif
+
+#if defined(__GNUC__)
+#define DENSITY_PREFETCH(p)                       __builtin_prefetch(p)
+#else
+#define DENSITY_PREFETCH(p)
+#endif
 
 #define density_bitsizeof(x) (8 * sizeof(x))
 

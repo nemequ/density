@@ -45,6 +45,10 @@
 #include "kernel_lion_decode.h"
 #include "memory_location.h"
 
+#if defined(_MSC_VER)
+#include <intrin.h>
+#endif
+
 const uint8_t density_lion_decode_bitmasks[DENSITY_LION_DECODE_NUMBER_OF_BITMASK_VALUES] = DENSITY_LION_DECODE_BITMASK_VALUES;
 
 DENSITY_FORCE_INLINE DENSITY_KERNEL_DECODE_STATE density_lion_decode_exit_process(density_lion_decode_state *state, DENSITY_LION_DECODE_PROCESS process, DENSITY_KERNEL_DECODE_STATE kernelDecodeState) {
@@ -52,7 +56,7 @@ DENSITY_FORCE_INLINE DENSITY_KERNEL_DECODE_STATE density_lion_decode_exit_proces
     return kernelDecodeState;
 }
 
-DENSITY_FORCE_INLINE DENSITY_KERNEL_DECODE_STATE density_lion_decode_check_block_state(density_lion_decode_state *restrict state) {
+DENSITY_FORCE_INLINE DENSITY_KERNEL_DECODE_STATE density_lion_decode_check_block_state(density_lion_decode_state *DENSITY_RESTRICT state) {
     if (density_unlikely((state->chunksCount >= DENSITY_LION_PREFERRED_EFFICIENCY_CHECK_CHUNKS) && (!state->efficiencyChecked))) {
         state->efficiencyChecked = true;
         return DENSITY_KERNEL_DECODE_STATE_INFO_EFFICIENCY_CHECK;
@@ -75,40 +79,40 @@ DENSITY_FORCE_INLINE DENSITY_KERNEL_DECODE_STATE density_lion_decode_check_block
     return DENSITY_KERNEL_DECODE_STATE_READY;
 }
 
-DENSITY_FORCE_INLINE void density_lion_decode_read_signature_from_memory(density_memory_location *restrict in, density_lion_decode_state *restrict state) {
+DENSITY_FORCE_INLINE void density_lion_decode_read_signature_from_memory(density_memory_location *DENSITY_RESTRICT in, density_lion_decode_state *DENSITY_RESTRICT state) {
     DENSITY_MEMCPY(&state->signature, in->pointer, sizeof(density_lion_signature));
     in->pointer += sizeof(density_lion_signature);
 }
 
-DENSITY_FORCE_INLINE void density_lion_decode_update_predictions_model(density_lion_dictionary_chunk_prediction_entry *const restrict predictions, const uint32_t chunk) {
+DENSITY_FORCE_INLINE void density_lion_decode_update_predictions_model(density_lion_dictionary_chunk_prediction_entry *const DENSITY_RESTRICT predictions, const uint32_t chunk) {
     DENSITY_MEMMOVE((uint32_t *) predictions + 1, predictions, 2 * sizeof(uint32_t));
     *(uint32_t *) predictions = chunk;     // Move chunk to the top of the predictions list
 }
 
-DENSITY_FORCE_INLINE void density_lion_decode_update_dictionary_model(density_lion_dictionary_chunk_entry *const restrict entry, const uint32_t chunk) {
+DENSITY_FORCE_INLINE void density_lion_decode_update_dictionary_model(density_lion_dictionary_chunk_entry *const DENSITY_RESTRICT entry, const uint32_t chunk) {
     DENSITY_MEMMOVE((uint32_t *) entry + 1, entry, 3 * sizeof(uint32_t));
     *(uint32_t *) entry = chunk;
 }
 
-DENSITY_FORCE_INLINE void density_lion_decode_read_hash(density_memory_location *restrict in, uint16_t *restrict const hash) {
+DENSITY_FORCE_INLINE void density_lion_decode_read_hash(density_memory_location *DENSITY_RESTRICT in, uint16_t *DENSITY_RESTRICT const hash) {
     DENSITY_MEMCPY(hash, in->pointer, sizeof(uint16_t));
     in->pointer += sizeof(uint16_t);
 }
 
-DENSITY_FORCE_INLINE void density_lion_decode_prediction_generic(density_memory_location *restrict out, density_lion_decode_state *restrict state, uint16_t *restrict const hash, uint32_t *restrict const chunk) {
+DENSITY_FORCE_INLINE void density_lion_decode_prediction_generic(density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state, uint16_t *DENSITY_RESTRICT const hash, uint32_t *DENSITY_RESTRICT const chunk) {
     *hash = DENSITY_LION_HASH_ALGORITHM(*chunk);
     DENSITY_MEMCPY(out->pointer, chunk, sizeof(uint32_t));
     out->pointer += sizeof(uint32_t);
 }
 
-DENSITY_FORCE_INLINE void density_lion_decode_dictionary_generic(density_memory_location *restrict in, density_memory_location *restrict out, density_lion_decode_state *restrict state, uint16_t *restrict const hash, uint32_t *restrict const chunk) {
+DENSITY_FORCE_INLINE void density_lion_decode_dictionary_generic(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state, uint16_t *DENSITY_RESTRICT const hash, uint32_t *DENSITY_RESTRICT const chunk) {
     DENSITY_MEMCPY(out->pointer, chunk, sizeof(uint32_t));
     out->pointer += sizeof(uint32_t);
     density_lion_dictionary_chunk_prediction_entry *p = &(state->dictionary.predictions[state->lastHash]);
     density_lion_decode_update_predictions_model(p, *chunk);
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_prediction_a(density_memory_location *restrict in, density_memory_location *restrict out, density_lion_decode_state *restrict state, uint16_t *restrict const hash, uint32_t *restrict const chunk) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_prediction_a(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state, uint16_t *DENSITY_RESTRICT const hash, uint32_t *DENSITY_RESTRICT const chunk) {
     *chunk = state->dictionary.predictions[state->lastHash].next_chunk_a;
     density_lion_decode_prediction_generic(out, state, hash, chunk);
 
@@ -116,7 +120,7 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_prediction_
     state->lastHash = *hash;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_prediction_b(density_memory_location *restrict in, density_memory_location *restrict out, density_lion_decode_state *restrict state, uint16_t *restrict const hash, uint32_t *restrict const chunk) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_prediction_b(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state, uint16_t *DENSITY_RESTRICT const hash, uint32_t *DENSITY_RESTRICT const chunk) {
     density_lion_dictionary_chunk_prediction_entry *const p = &state->dictionary.predictions[state->lastHash];
     *chunk = p->next_chunk_b;
     density_lion_decode_update_predictions_model(p, *chunk);
@@ -126,7 +130,7 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_prediction_
     state->lastHash = *hash;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_prediction_c(density_memory_location *restrict in, density_memory_location *restrict out, density_lion_decode_state *restrict state, uint16_t *restrict const hash, uint32_t *restrict const chunk) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_prediction_c(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state, uint16_t *DENSITY_RESTRICT const hash, uint32_t *DENSITY_RESTRICT const chunk) {
     density_lion_dictionary_chunk_prediction_entry *const p = &state->dictionary.predictions[state->lastHash];
     *chunk = p->next_chunk_c;
     density_lion_decode_update_predictions_model(p, *chunk);
@@ -136,9 +140,9 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_prediction_
     state->lastHash = *hash;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_dictionary_a(density_memory_location *restrict in, density_memory_location *restrict out, density_lion_decode_state *restrict state, uint16_t *restrict const hash, uint32_t *restrict const chunk) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_dictionary_a(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state, uint16_t *DENSITY_RESTRICT const hash, uint32_t *DENSITY_RESTRICT const chunk) {
     density_lion_decode_read_hash(in, hash);
-    __builtin_prefetch(&state->dictionary.predictions[*hash]);
+    DENSITY_PREFETCH(&state->dictionary.predictions[*hash]);
     *chunk = state->dictionary.chunks[*hash].chunk_a;
     density_lion_decode_dictionary_generic(in, out, state, hash, chunk);
 
@@ -146,9 +150,9 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_dictionary_
     state->lastHash = *hash;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_dictionary_b(density_memory_location *restrict in, density_memory_location *restrict out, density_lion_decode_state *restrict state, uint16_t *restrict const hash, uint32_t *restrict const chunk) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_dictionary_b(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state, uint16_t *DENSITY_RESTRICT const hash, uint32_t *DENSITY_RESTRICT const chunk) {
     density_lion_decode_read_hash(in, hash);
-    __builtin_prefetch(&state->dictionary.predictions[*hash]);
+    DENSITY_PREFETCH(&state->dictionary.predictions[*hash]);
     density_lion_dictionary_chunk_entry *entry = &state->dictionary.chunks[*hash];
     *chunk = entry->chunk_b;
     density_lion_decode_update_dictionary_model(entry, *chunk);
@@ -158,9 +162,9 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_dictionary_
     state->lastHash = *hash;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_dictionary_c(density_memory_location *restrict in, density_memory_location *restrict out, density_lion_decode_state *restrict state, uint16_t *restrict const hash, uint32_t *restrict const chunk) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_dictionary_c(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state, uint16_t *DENSITY_RESTRICT const hash, uint32_t *DENSITY_RESTRICT const chunk) {
     density_lion_decode_read_hash(in, hash);
-    __builtin_prefetch(&state->dictionary.predictions[*hash]);
+    DENSITY_PREFETCH(&state->dictionary.predictions[*hash]);
     density_lion_dictionary_chunk_entry *entry = &state->dictionary.chunks[*hash];
     *chunk = entry->chunk_c;
     density_lion_decode_update_dictionary_model(entry, *chunk);
@@ -170,9 +174,9 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_dictionary_
     state->lastHash = *hash;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_dictionary_d(density_memory_location *restrict in, density_memory_location *restrict out, density_lion_decode_state *restrict state, uint16_t *restrict const hash, uint32_t *restrict const chunk) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_dictionary_d(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state, uint16_t *DENSITY_RESTRICT const hash, uint32_t *DENSITY_RESTRICT const chunk) {
     density_lion_decode_read_hash(in, hash);
-    __builtin_prefetch(&state->dictionary.predictions[*hash]);
+    DENSITY_PREFETCH(&state->dictionary.predictions[*hash]);
     density_lion_dictionary_chunk_entry *entry = &state->dictionary.chunks[*hash];
     *chunk = entry->chunk_d;
     density_lion_decode_update_dictionary_model(entry, *chunk);
@@ -182,7 +186,7 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_dictionary_
     state->lastHash = *hash;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_plain(density_memory_location *restrict in, density_memory_location *restrict out, density_lion_decode_state *restrict state, uint16_t *restrict const hash, uint32_t *restrict const chunk) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_plain(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state, uint16_t *DENSITY_RESTRICT const hash, uint32_t *DENSITY_RESTRICT const chunk) {
     DENSITY_MEMCPY(chunk, in->pointer, sizeof(uint32_t));
     in->pointer += sizeof(uint32_t);
     *hash = DENSITY_LION_HASH_ALGORITHM(*chunk);
@@ -197,17 +201,34 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_lion_decode_plain(densi
     state->lastHash = *hash;
 }
 
-DENSITY_FORCE_INLINE void density_lion_decode_chunk(density_memory_location *restrict in, density_memory_location *restrict out, density_lion_decode_state *restrict state, const DENSITY_LION_FORM form) {
+DENSITY_FORCE_INLINE void density_lion_decode_chunk(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state, const DENSITY_LION_FORM form) {
     uint16_t hash;
     uint32_t chunk;
 
     state->formData.attachments[form](in, out, state, &hash, &chunk);
 }
 
-DENSITY_FORCE_INLINE const DENSITY_LION_FORM density_lion_decode_read_form(density_memory_location *restrict in, density_lion_decode_state *restrict state) {
+DENSITY_FORCE_INLINE uint_fast8_t density_lion_ctz (density_lion_signature value) {
+#if defined(__GNUC__)
+    return (uint_fast8_t) __builtin_ctz(value);
+#elif defined(_MSC_VER)
+    unsigned long res;
+    _BitScanForward(&res, value);
+    return (uint_fast8_t) res;
+#else
+    /* http://graphics.stanford.edu/~seander/bithacks.html#ZerosOnRightMultLookup */
+    static const int MultiplyDeBruijnBitPosition[32] = {
+        0, 1, 28, 2, 29, 14, 24, 3, 30, 22, 20, 15, 25, 17, 4, 8,
+        31, 27, 13, 23, 21, 19, 16, 7, 26, 12, 18, 6, 11, 5, 10, 9
+    };
+    return (uint_fast8_t) MultiplyDeBruijnBitPosition[((uint32_t)((value & -value) * 0x077CB531U)) >> 27];
+#endif
+}
+
+DENSITY_FORCE_INLINE const DENSITY_LION_FORM density_lion_decode_read_form(density_memory_location *DENSITY_RESTRICT in, density_lion_decode_state *DENSITY_RESTRICT state) {
     density_lion_form_data *const form_data = &state->formData;
     const uint_fast8_t shift = state->shift;
-    const uint_fast8_t trailing_zeroes = __builtin_ctz(0x80 | (state->signature >> shift));
+    const uint_fast8_t trailing_zeroes = density_lion_ctz(0x80 | (state->signature >> shift));
     if (density_likely(!trailing_zeroes)) {
         state->shift = (shift + 1) & 0x3f;
         return density_lion_form_model_increment_usage(form_data, (density_lion_form_node *) form_data->formsPool);
@@ -222,7 +243,7 @@ DENSITY_FORCE_INLINE const DENSITY_LION_FORM density_lion_decode_read_form(densi
             density_lion_decode_read_signature_from_memory(in, state);
             const uint_fast8_t primary_trailing_zeroes = density_bitsizeof(density_lion_signature) - shift;
             const uint_fast8_t ctz_barrier_shift = 7 - primary_trailing_zeroes;
-            const uint_fast8_t secondary_trailing_zeroes = __builtin_ctz((1 << ctz_barrier_shift) | state->signature);
+            const uint_fast8_t secondary_trailing_zeroes = density_lion_ctz((1 << ctz_barrier_shift) | state->signature);
             if (density_likely(secondary_trailing_zeroes != ctz_barrier_shift))
                 state->shift = secondary_trailing_zeroes + 1;
             else
@@ -232,7 +253,7 @@ DENSITY_FORCE_INLINE const DENSITY_LION_FORM density_lion_decode_read_form(densi
     }
 }
 
-DENSITY_FORCE_INLINE void density_lion_decode_process_form(density_memory_location *restrict in, density_memory_location *restrict out, density_lion_decode_state *restrict state) {
+DENSITY_FORCE_INLINE void density_lion_decode_process_form(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state) {
     const uint_fast8_t shift = state->shift;
     density_lion_form_data *const form_data = &state->formData;
 
@@ -250,7 +271,7 @@ DENSITY_FORCE_INLINE void density_lion_decode_process_form(density_memory_locati
     }
 }
 
-DENSITY_FORCE_INLINE void density_lion_decode_process_unit(density_memory_location *restrict in, density_memory_location *restrict out, density_lion_decode_state *restrict state) {
+DENSITY_FORCE_INLINE void density_lion_decode_process_unit(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state) {
 #ifdef __clang__
     for (uint_fast8_t count = 0; count < (DENSITY_LION_CHUNKS_PER_PROCESS_UNIT_BIG >> 2); count++) {
         DENSITY_UNROLL_4(density_lion_decode_process_form(in, out, state));
@@ -264,7 +285,7 @@ DENSITY_FORCE_INLINE void density_lion_decode_process_unit(density_memory_locati
     state->chunksCount += DENSITY_LION_CHUNKS_PER_PROCESS_UNIT_BIG;
 }
 
-DENSITY_FORCE_INLINE DENSITY_LION_DECODE_STEP_BY_STEP_STATUS density_lion_decode_chunk_step_by_step(density_memory_location *restrict readMemoryLocation, density_memory_teleport *restrict in, density_memory_location *restrict out, density_lion_decode_state *restrict state) {
+DENSITY_FORCE_INLINE DENSITY_LION_DECODE_STEP_BY_STEP_STATUS density_lion_decode_chunk_step_by_step(density_memory_location *DENSITY_RESTRICT readMemoryLocation, density_memory_teleport *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_lion_decode_state *DENSITY_RESTRICT state) {
     density_byte *startPointer = readMemoryLocation->pointer;
     if (density_unlikely(!state->shift))
         density_lion_decode_read_signature_from_memory(readMemoryLocation, state);

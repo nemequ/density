@@ -39,13 +39,13 @@ DENSITY_FORCE_INLINE DENSITY_BLOCK_DECODE_STATE exitProcess(density_block_decode
     return blockDecodeState;
 }
 
-DENSITY_FORCE_INLINE void density_block_decode_update_integrity_data(density_memory_location *restrict out, density_block_decode_state *restrict state) {
+DENSITY_FORCE_INLINE void density_block_decode_update_integrity_data(density_memory_location *DENSITY_RESTRICT out, density_block_decode_state *DENSITY_RESTRICT state) {
     state->integrityData.outputPointer = out->pointer;
 
     state->integrityData.update = false;
 }
 
-DENSITY_FORCE_INLINE void density_block_decode_update_integrity_hash(density_memory_location *restrict out, density_block_decode_state *restrict state, bool pendingExit) {
+DENSITY_FORCE_INLINE void density_block_decode_update_integrity_hash(density_memory_location *DENSITY_RESTRICT out, density_block_decode_state *DENSITY_RESTRICT state, bool pendingExit) {
     const density_byte *const pointerBefore = state->integrityData.outputPointer;
     const density_byte *const pointerAfter = out->pointer;
     const uint_fast64_t processed = pointerAfter - pointerBefore;
@@ -58,7 +58,7 @@ DENSITY_FORCE_INLINE void density_block_decode_update_integrity_hash(density_mem
         density_block_decode_update_integrity_data(out, state);
 }
 
-DENSITY_FORCE_INLINE DENSITY_BLOCK_DECODE_STATE density_block_decode_read_block_header(density_memory_teleport *restrict in, density_memory_location *restrict out, density_block_decode_state *restrict state) {
+DENSITY_FORCE_INLINE DENSITY_BLOCK_DECODE_STATE density_block_decode_read_block_header(density_memory_teleport *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_block_decode_state *DENSITY_RESTRICT state) {
     density_memory_location *readLocation;
     if (!(readLocation = density_memory_teleport_read_reserved(in, sizeof(density_block_header), state->endDataOverhead)))
         return DENSITY_BLOCK_DECODE_STATE_STALL_ON_INPUT;
@@ -79,7 +79,7 @@ DENSITY_FORCE_INLINE DENSITY_BLOCK_DECODE_STATE density_block_decode_read_block_
     return DENSITY_BLOCK_DECODE_STATE_READY;
 }
 
-DENSITY_FORCE_INLINE DENSITY_BLOCK_DECODE_STATE density_block_decode_read_block_footer(density_memory_teleport *restrict in, density_memory_location *restrict out, density_block_decode_state *restrict state) {
+DENSITY_FORCE_INLINE DENSITY_BLOCK_DECODE_STATE density_block_decode_read_block_footer(density_memory_teleport *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_block_decode_state *DENSITY_RESTRICT state) {
     density_memory_location *readLocation;
     if (!(readLocation = density_memory_teleport_read(in, sizeof(density_block_footer))))
         return DENSITY_BLOCK_DECODE_STATE_STALL_ON_INPUT;
@@ -97,7 +97,7 @@ DENSITY_FORCE_INLINE DENSITY_BLOCK_DECODE_STATE density_block_decode_read_block_
     return DENSITY_BLOCK_DECODE_STATE_READY;
 }
 
-DENSITY_FORCE_INLINE DENSITY_BLOCK_DECODE_STATE density_block_decode_read_block_mode_marker(density_memory_teleport *restrict in, density_block_decode_state *restrict state) {
+DENSITY_FORCE_INLINE DENSITY_BLOCK_DECODE_STATE density_block_decode_read_block_mode_marker(density_memory_teleport *DENSITY_RESTRICT in, density_block_decode_state *DENSITY_RESTRICT state) {
     density_memory_location *readLocation;
     if (!(readLocation = density_memory_teleport_read_reserved(in, sizeof(density_mode_marker), state->endDataOverhead)))
         return DENSITY_BLOCK_DECODE_STATE_STALL_ON_INPUT;
@@ -109,12 +109,12 @@ DENSITY_FORCE_INLINE DENSITY_BLOCK_DECODE_STATE density_block_decode_read_block_
     return DENSITY_BLOCK_DECODE_STATE_READY;
 }
 
-DENSITY_FORCE_INLINE void density_block_decode_update_totals(density_memory_teleport *restrict in, density_memory_location *restrict out, density_block_decode_state *restrict state, const uint_fast64_t inAvailableBefore, const uint_fast64_t outAvailableBefore) {
+DENSITY_FORCE_INLINE void density_block_decode_update_totals(density_memory_teleport *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_block_decode_state *DENSITY_RESTRICT state, const uint_fast64_t inAvailableBefore, const uint_fast64_t outAvailableBefore) {
     state->totalRead += inAvailableBefore - density_memory_teleport_available_bytes_reserved(in, state->endDataOverhead);
     state->totalWritten += outAvailableBefore - out->available_bytes;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_BLOCK_DECODE_STATE density_block_decode_init(density_block_decode_state *restrict state, const DENSITY_COMPRESSION_MODE mode, const DENSITY_BLOCK_TYPE blockType, const density_main_header_parameters parameters, const uint_fast8_t endDataOverhead, void *kernelState, DENSITY_KERNEL_DECODE_STATE (*kernelInit)(void *, const density_main_header_parameters, const uint_fast8_t), DENSITY_KERNEL_DECODE_STATE (*kernelProcess)(density_memory_teleport *, density_memory_location *, void *), DENSITY_KERNEL_DECODE_STATE (*kernelFinish)(density_memory_teleport *, density_memory_location *, void *), void *(*mem_alloc)(size_t)) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_BLOCK_DECODE_STATE density_block_decode_init(density_block_decode_state *DENSITY_RESTRICT state, const DENSITY_COMPRESSION_MODE mode, const DENSITY_BLOCK_TYPE blockType, const density_main_header_parameters parameters, const uint_fast8_t endDataOverhead, void *kernelState, DENSITY_KERNEL_DECODE_STATE (*kernelInit)(void *, const density_main_header_parameters, const uint_fast8_t), DENSITY_KERNEL_DECODE_STATE (*kernelProcess)(density_memory_teleport *, density_memory_location *, void *), DENSITY_KERNEL_DECODE_STATE (*kernelFinish)(density_memory_teleport *, density_memory_location *, void *), void *(*mem_alloc)(size_t)) {
     state->targetMode = mode;
     state->currentMode = mode;
     state->blockType = blockType;

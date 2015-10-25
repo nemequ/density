@@ -57,7 +57,7 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE void density_stream_destroy(density_
     memory_free(stream);
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_STREAM_STATE density_stream_prepare(density_stream *restrict stream, const uint8_t *restrict in, const uint_fast64_t availableIn, uint8_t *restrict out, const uint_fast64_t availableOut) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_STREAM_STATE density_stream_prepare(density_stream *DENSITY_RESTRICT stream, const uint8_t *DENSITY_RESTRICT in, const uint_fast64_t availableIn, uint8_t *DENSITY_RESTRICT out, const uint_fast64_t availableOut) {
     density_memory_teleport_reset_staging_buffer(stream->in);
     density_stream_update_input(stream, in, availableIn);
     density_stream_update_output(stream, out, availableOut);
@@ -67,13 +67,13 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_STREAM_STATE density_stream_
     return DENSITY_STREAM_STATE_READY;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_STREAM_STATE density_stream_update_input(density_stream *restrict stream, const uint8_t *restrict in, const uint_fast64_t availableIn) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_STREAM_STATE density_stream_update_input(density_stream *DENSITY_RESTRICT stream, const uint8_t *DENSITY_RESTRICT in, const uint_fast64_t availableIn) {
     density_memory_teleport_change_input_buffer(stream->in, in, availableIn);
 
     return DENSITY_STREAM_STATE_READY;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_STREAM_STATE density_stream_update_output(density_stream *restrict stream, uint8_t *out, const uint_fast64_t availableOut) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_STREAM_STATE density_stream_update_output(density_stream *DENSITY_RESTRICT stream, uint8_t *out, const uint_fast64_t availableOut) {
     density_memory_location_encapsulate(stream->out, out, availableOut);
 
     return DENSITY_STREAM_STATE_READY;
@@ -90,7 +90,7 @@ DENSITY_FORCE_INLINE DENSITY_STREAM_STATE density_stream_check_conformity(densit
     return DENSITY_STREAM_STATE_READY;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_STREAM_STATE density_stream_compress_init(density_stream *restrict stream, const DENSITY_COMPRESSION_MODE compressionMode, const DENSITY_BLOCK_TYPE blockType) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_STREAM_STATE density_stream_compress_init(density_stream *DENSITY_RESTRICT stream, const DENSITY_COMPRESSION_MODE compressionMode, const DENSITY_BLOCK_TYPE blockType) {
     if (((density_stream_state *) stream->internal_state)->process ^ DENSITY_STREAM_PROCESS_PREPARED)
         return DENSITY_STREAM_STATE_ERROR_INVALID_INTERNAL_STATE;
 
@@ -178,7 +178,7 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_STREAM_STATE density_stream_
     return DENSITY_STREAM_STATE_READY;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_STREAM_STATE density_stream_decompress_init(density_stream *restrict stream, density_stream_header_information *restrict headerInformation) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_STREAM_STATE density_stream_decompress_init(density_stream *DENSITY_RESTRICT stream, density_stream_header_information *DENSITY_RESTRICT headerInformation) {
     if (((density_stream_state *) stream->internal_state)->process ^ DENSITY_STREAM_PROCESS_PREPARED)
         return DENSITY_STREAM_STATE_ERROR_INVALID_INTERNAL_STATE;
 

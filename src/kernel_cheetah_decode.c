@@ -50,7 +50,7 @@ DENSITY_FORCE_INLINE DENSITY_KERNEL_DECODE_STATE density_cheetah_decode_exit_pro
     return kernelDecodeState;
 }
 
-DENSITY_FORCE_INLINE DENSITY_KERNEL_DECODE_STATE density_cheetah_decode_check_state(density_memory_location *restrict out, density_cheetah_decode_state *restrict state) {
+DENSITY_FORCE_INLINE DENSITY_KERNEL_DECODE_STATE density_cheetah_decode_check_state(density_memory_location *DENSITY_RESTRICT out, density_cheetah_decode_state *DENSITY_RESTRICT state) {
     if (out->available_bytes < DENSITY_CHEETAH_DECOMPRESSED_UNIT_SIZE)
         return DENSITY_KERNEL_DECODE_STATE_STALL_ON_OUTPUT;
 
@@ -82,29 +82,29 @@ DENSITY_FORCE_INLINE DENSITY_KERNEL_DECODE_STATE density_cheetah_decode_check_st
     return DENSITY_KERNEL_DECODE_STATE_READY;
 }
 
-DENSITY_FORCE_INLINE void density_cheetah_decode_read_signature(density_memory_location *restrict in, density_cheetah_decode_state *restrict state) {
+DENSITY_FORCE_INLINE void density_cheetah_decode_read_signature(density_memory_location *DENSITY_RESTRICT in, density_cheetah_decode_state *DENSITY_RESTRICT state) {
     DENSITY_MEMCPY(&state->signature, in->pointer, sizeof(density_cheetah_signature));
     in->pointer += sizeof(density_cheetah_signature);
     state->shift = 0;
     state->signaturesCount++;
 }
 
-DENSITY_FORCE_INLINE void density_cheetah_decode_process_predicted(density_memory_location *restrict out, density_cheetah_decode_state *restrict state) {
+DENSITY_FORCE_INLINE void density_cheetah_decode_process_predicted(density_memory_location *DENSITY_RESTRICT out, density_cheetah_decode_state *DENSITY_RESTRICT state) {
     const uint32_t chunk = state->dictionary.prediction_entries[state->lastHash].next_chunk_prediction;
     DENSITY_MEMCPY(out->pointer, &chunk, sizeof(uint32_t));
     state->lastHash = DENSITY_CHEETAH_HASH_ALGORITHM(chunk);
 }
 
-DENSITY_FORCE_INLINE void density_cheetah_decode_process_compressed_a(const uint16_t hash, density_memory_location *restrict out, density_cheetah_decode_state *restrict state) {
-    __builtin_prefetch(&state->dictionary.prediction_entries[hash]);
+DENSITY_FORCE_INLINE void density_cheetah_decode_process_compressed_a(const uint16_t hash, density_memory_location *DENSITY_RESTRICT out, density_cheetah_decode_state *DENSITY_RESTRICT state) {
+    DENSITY_PREFETCH(&state->dictionary.prediction_entries[hash]);
     const uint32_t chunk = state->dictionary.entries[hash].chunk_a;
     DENSITY_MEMCPY(out->pointer, &chunk, sizeof(uint32_t));
     state->dictionary.prediction_entries[state->lastHash].next_chunk_prediction = chunk;
     state->lastHash = hash;
 }
 
-DENSITY_FORCE_INLINE void density_cheetah_decode_process_compressed_b(const uint16_t hash, density_memory_location *restrict out, density_cheetah_decode_state *restrict state) {
-    __builtin_prefetch(&state->dictionary.prediction_entries[hash]);
+DENSITY_FORCE_INLINE void density_cheetah_decode_process_compressed_b(const uint16_t hash, density_memory_location *DENSITY_RESTRICT out, density_cheetah_decode_state *DENSITY_RESTRICT state) {
+    DENSITY_PREFETCH(&state->dictionary.prediction_entries[hash]);
     density_cheetah_dictionary_entry *const entry = &state->dictionary.entries[hash];
     const uint32_t chunk = entry->chunk_b;
     entry->chunk_b = entry->chunk_a;
@@ -114,9 +114,9 @@ DENSITY_FORCE_INLINE void density_cheetah_decode_process_compressed_b(const uint
     state->lastHash = hash;
 }
 
-DENSITY_FORCE_INLINE void density_cheetah_decode_process_uncompressed(const uint32_t chunk, density_memory_location *restrict out, density_cheetah_decode_state *restrict state) {
+DENSITY_FORCE_INLINE void density_cheetah_decode_process_uncompressed(const uint32_t chunk, density_memory_location *DENSITY_RESTRICT out, density_cheetah_decode_state *DENSITY_RESTRICT state) {
     const uint16_t hash = DENSITY_CHEETAH_HASH_ALGORITHM(chunk);
-    __builtin_prefetch(&state->dictionary.prediction_entries[hash]);
+    DENSITY_PREFETCH(&state->dictionary.prediction_entries[hash]);
     density_cheetah_dictionary_entry *const entry = &state->dictionary.entries[hash];
     entry->chunk_b = entry->chunk_a;
     entry->chunk_a = chunk;
@@ -125,7 +125,7 @@ DENSITY_FORCE_INLINE void density_cheetah_decode_process_uncompressed(const uint
     state->lastHash = hash;
 }
 
-DENSITY_FORCE_INLINE void density_cheetah_decode_kernel(density_memory_location *restrict in, density_memory_location *restrict out, const uint8_t mode, density_cheetah_decode_state *restrict state) {
+DENSITY_FORCE_INLINE void density_cheetah_decode_kernel(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, const uint8_t mode, density_cheetah_decode_state *DENSITY_RESTRICT state) {
     uint16_t hash;
     uint32_t chunk;
 
@@ -155,7 +155,7 @@ DENSITY_FORCE_INLINE void density_cheetah_decode_kernel(density_memory_location 
     out->pointer += sizeof(uint32_t);
 }
 
-DENSITY_FORCE_INLINE void density_cheetah_decode_process_data(density_memory_location *restrict in, density_memory_location *restrict out, density_cheetah_decode_state *restrict state) {
+DENSITY_FORCE_INLINE void density_cheetah_decode_process_data(density_memory_location *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_cheetah_decode_state *DENSITY_RESTRICT state) {
     uint_fast8_t count = 0;
 
 #ifdef __clang__

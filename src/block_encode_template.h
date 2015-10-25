@@ -33,9 +33,9 @@
  */
 
 #ifndef DENSITY_BLOCK_ENCODE_FINISH
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_BLOCK_ENCODE_STATE density_block_encode_continue(density_memory_teleport *restrict in, density_memory_location *restrict out, density_block_encode_state *restrict state) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_BLOCK_ENCODE_STATE density_block_encode_continue(density_memory_teleport *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_block_encode_state *DENSITY_RESTRICT state) {
 #else
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_BLOCK_ENCODE_STATE density_block_encode_finish(density_memory_teleport *restrict in, density_memory_location *restrict out, density_block_encode_state *restrict state, void (*mem_free)(void *)) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_BLOCK_ENCODE_STATE density_block_encode_finish(density_memory_teleport *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_block_encode_state *DENSITY_RESTRICT state, void (*mem_free)(void *)) {
 #endif
     DENSITY_BLOCK_ENCODE_STATE blockEncodeState;
     DENSITY_KERNEL_ENCODE_STATE kernelEncodeState;

@@ -34,7 +34,7 @@
 
 #include "block_footer.h"
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE uint_fast32_t density_block_footer_read(density_memory_location *restrict in, density_block_footer *restrict blockFooter) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE uint_fast32_t density_block_footer_read(density_memory_location *DENSITY_RESTRICT in, density_block_footer *DENSITY_RESTRICT blockFooter) {
     DENSITY_MEMCPY(&blockFooter->hashsum1, in->pointer, sizeof(uint64_t));
     in->pointer += sizeof(uint64_t);
     DENSITY_MEMCPY(&blockFooter->hashsum2, in->pointer, sizeof(uint64_t));

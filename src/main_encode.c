@@ -39,7 +39,7 @@ DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_exit_process(density_en
     return encodeState;
 }
 
-DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_write_header(density_memory_location *restrict out, density_encode_state *restrict state, const DENSITY_COMPRESSION_MODE compressionMode, const DENSITY_BLOCK_TYPE blockType) {
+DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_write_header(density_memory_location *DENSITY_RESTRICT out, density_encode_state *DENSITY_RESTRICT state, const DENSITY_COMPRESSION_MODE compressionMode, const DENSITY_BLOCK_TYPE blockType) {
     if (sizeof(density_main_header) > out->available_bytes)
         return DENSITY_ENCODE_STATE_STALL_ON_OUTPUT;
 
@@ -54,7 +54,7 @@ DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_write_header(density_me
     return DENSITY_ENCODE_STATE_READY;
 }
 
-DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_write_footer(density_memory_location *restrict out, density_encode_state *restrict state) {
+DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_write_footer(density_memory_location *DENSITY_RESTRICT out, density_encode_state *DENSITY_RESTRICT state) {
     if (sizeof(density_main_footer) > out->available_bytes)
         return DENSITY_ENCODE_STATE_STALL_ON_OUTPUT;
 
@@ -63,12 +63,12 @@ DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_write_footer(density_me
     return DENSITY_ENCODE_STATE_READY;
 }
 
-DENSITY_FORCE_INLINE void density_encode_update_totals(density_memory_teleport *restrict in, density_memory_location *restrict out, density_encode_state *restrict state, const uint_fast64_t availableInBefore, const uint_fast64_t availableOutBefore) {
+DENSITY_FORCE_INLINE void density_encode_update_totals(density_memory_teleport *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_encode_state *DENSITY_RESTRICT state, const uint_fast64_t availableInBefore, const uint_fast64_t availableOutBefore) {
     state->totalRead += availableInBefore - density_memory_teleport_available_bytes(in);
     state->totalWritten += availableOutBefore - out->available_bytes;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_init(density_memory_location *restrict out, density_encode_state *restrict state, const DENSITY_COMPRESSION_MODE mode, const DENSITY_BLOCK_TYPE blockType, void *(*mem_alloc)(size_t)) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_init(density_memory_location *DENSITY_RESTRICT out, density_encode_state *DENSITY_RESTRICT state, const DENSITY_COMPRESSION_MODE mode, const DENSITY_BLOCK_TYPE blockType, void *(*mem_alloc)(size_t)) {
     DENSITY_ENCODE_STATE encodeState;
     state->compressionMode = mode;
     state->blockType = blockType;
@@ -102,7 +102,7 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_
     return density_encode_exit_process(state, DENSITY_ENCODE_PROCESS_WRITE_BLOCKS, DENSITY_ENCODE_STATE_READY);
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_continue(density_memory_teleport *restrict in, density_memory_location *restrict out, density_encode_state *restrict state) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_continue(density_memory_teleport *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_encode_state *DENSITY_RESTRICT state) {
     DENSITY_BLOCK_ENCODE_STATE blockEncodeState;
     uint_fast64_t availableInBefore;
     uint_fast64_t availableOutBefore;
@@ -135,7 +135,7 @@ DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_
     goto write_blocks;
 }
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_finish(density_memory_teleport *restrict in, density_memory_location *restrict out, density_encode_state *restrict state, void (*mem_free)(void *)) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE DENSITY_ENCODE_STATE density_encode_finish(density_memory_teleport *DENSITY_RESTRICT in, density_memory_location *DENSITY_RESTRICT out, density_encode_state *DENSITY_RESTRICT state, void (*mem_free)(void *)) {
     DENSITY_ENCODE_STATE encodeState;
     DENSITY_BLOCK_ENCODE_STATE blockEncodeState;
     uint_fast64_t availableInBefore;

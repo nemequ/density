@@ -34,7 +34,7 @@
 
 #include "block_header.h"
 
-DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE uint_fast32_t density_block_header_read(density_memory_location *restrict in, density_block_header *restrict blockHeader) {
+DENSITY_WINDOWS_EXPORT DENSITY_FORCE_INLINE uint_fast32_t density_block_header_read(density_memory_location *DENSITY_RESTRICT in, density_block_header *DENSITY_RESTRICT blockHeader) {
     DENSITY_MEMCPY(&blockHeader->previousBlockRelativeStartPosition, in->pointer, sizeof(density_block_header));
     in->pointer += sizeof(density_block_header);
     in->available_bytes -= sizeof(density_block_header);
