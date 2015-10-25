@@ -77,7 +77,7 @@ DENSITY_WINDOWS_EXPORT const DENSITY_STREAM_STATE density_stream_compress_init(d
     ((density_stream_state *) stream->internal_state)->compression_mode = compression_mode;
 }
 
-DENSITY_WINDOWS_EXPORT const DENSITY_STREAM_STATE density_stream_compress_continue(density_stream *const restrict stream, const uint8_t *const restrict input_buffer, const uint_fast64_t input_size, uint8_t *const restrict output_buffer, const uint_fast64_t output_size) {
+DENSITY_WINDOWS_EXPORT const DENSITY_STREAM_STATE density_stream_compress_continue(density_stream *const DENSITY_RESTRICT stream, const uint8_t *const DENSITY_RESTRICT input_buffer, const uint_fast64_t input_size, uint8_t *const DENSITY_RESTRICT output_buffer, const uint_fast64_t output_size) {
     const uint8_t *in = input_buffer;
     uint8_t *out = output_buffer;
 
@@ -120,14 +120,14 @@ DENSITY_WINDOWS_EXPORT const DENSITY_STREAM_STATE density_stream_compress_contin
         //if(input_size < unit_size) {
         // fill temp buffer and exit
         //} else {
-        // encode temp buffer with restricted coarse encoding
-        // encode input_buffer with restricted coarse encoding
+        // encode temp buffer with DENSITY_RESTRICTed coarse encoding
+        // encode input_buffer with DENSITY_RESTRICTed coarse encoding
         // put the remaining input size in temp buffer and exit
         //}
     }*/
 }
 
-DENSITY_WINDOWS_EXPORT const DENSITY_STREAM_STATE density_stream_decompress_continue(density_stream *const restrict stream, const uint8_t *const restrict input_buffer, const uint_fast64_t input_size, uint8_t *const restrict output_buffer, const uint_fast64_t output_size) {
+DENSITY_WINDOWS_EXPORT const DENSITY_STREAM_STATE density_stream_decompress_continue(density_stream *const DENSITY_RESTRICT stream, const uint8_t *const DENSITY_RESTRICT input_buffer, const uint_fast64_t input_size, uint8_t *const DENSITY_RESTRICT output_buffer, const uint_fast64_t output_size) {
     const uint8_t *in = input_buffer;
     uint8_t *out = output_buffer;
 
@@ -140,9 +140,9 @@ DENSITY_WINDOWS_EXPORT const DENSITY_STREAM_STATE density_stream_decompress_cont
         //if(input_size < max_compressed_unit_size) {
         // fill temp buffer and exit
         //} else {
-        // decode temp buffer with restricted coarse decoding
+        // decode temp buffer with DENSITY_RESTRICTed coarse decoding
         // Mark the position at which we can start using input_buffer again
-        // decode input_buffer with restricted coarse decoding at the new position
+        // decode input_buffer with DENSITY_RESTRICTed coarse decoding at the new position
         // put the remaining input size in temp buffer and exit
         //}
     }
